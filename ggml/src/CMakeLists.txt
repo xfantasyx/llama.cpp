@@ -236,6 +236,10 @@ if (CMAKE_SYSTEM_NAME MATCHES "Linux")
     target_link_libraries(ggml PRIVATE dl)
 endif()
 
+list(APPEND GGML_ALL_LIBS ggml-base ggml)
+set(GGML_ALL_LIBS "${GGML_ALL_LIBS}" CACHE INTERNAL "${help}")
+
+
 function(ggml_add_backend_library backend)
     if (GGML_BACKEND_DL)
         add_library(${backend} MODULE ${ARGN})
@@ -246,8 +250,18 @@ function(ggml_add_backend_library backend)
     else()
         add_library(${backend} ${ARGN})
         target_link_libraries(ggml PUBLIC ${backend})
-        install(TARGETS ${backend} LIBRARY)
+        # install(TARGETS ${backend} LIBRARY)
+
+        install(
+            TARGETS ${backend}
+            EXPORT GGML_TARGETS
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            )
+
     endif()
+
+    list(APPEND GGML_ALL_LIBS ${backend})
+    set(GGML_ALL_LIBS "${GGML_ALL_LIBS}" CACHE INTERNAL "${help}")
 
     target_link_libraries(${backend} PRIVATE ggml-base)
     target_include_directories(${backend} PRIVATE ..)

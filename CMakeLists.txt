@@ -199,10 +199,23 @@ set_target_properties(llama
 
 install(TARGETS llama LIBRARY PUBLIC_HEADER)
 
+
+install(
+  EXPORT
+    LLAMA_TARGETS
+  FILE
+    llama-targets.cmake
+
+  DESTINATION
+    cmake
+)
+
+
+
 configure_package_config_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/llama-config.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/llama-config.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/llama
+    INSTALL_DESTINATION cmake
     PATH_VARS LLAMA_INCLUDE_INSTALL_DIR
               LLAMA_LIB_INSTALL_DIR
               LLAMA_BIN_INSTALL_DIR )
@@ -214,7 +227,7 @@ write_basic_package_version_file(
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/llama-config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/llama-version.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/llama)
+        DESTINATION cmake)
 
 install(
     FILES convert_hf_to_gguf.py

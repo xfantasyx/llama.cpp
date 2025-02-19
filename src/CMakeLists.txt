@@ -29,7 +29,16 @@ add_library(llama
             unicode-data.cpp
             )
 
-target_include_directories(llama PUBLIC . ../include ../common)
+target_include_directories(llama
+  INTERFACE
+  $<INSTALL_INTERFACE:include>
+  PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/../common>
+)
+
+# target_include_directories(llama PUBLIC . ../include ../common)
 target_compile_features   (llama PUBLIC cxx_std_17) # don't bump
 
 target_link_libraries(llama PUBLIC ggml)
@@ -39,3 +48,11 @@ if (BUILD_SHARED_LIBS)
     target_compile_definitions(llama PRIVATE LLAMA_BUILD)
     target_compile_definitions(llama PUBLIC  LLAMA_SHARED)
 endif()
+
+install(
+  TARGETS llama
+  EXPORT LLAMA_TARGETS
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)

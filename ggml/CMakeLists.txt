@@ -209,6 +209,12 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 find_package(Threads REQUIRED)
 
+set(GGML_ALL_LIBS ""
+    CACHE
+    INTERNAL
+    "Aggregation of all built libraries."
+)
+
 #
 # build the library
 #
@@ -256,8 +262,17 @@ set_target_properties(ggml PROPERTIES PUBLIC_HEADER "${GGML_PUBLIC_HEADERS}")
 #if (GGML_METAL)
 #    set_target_properties(ggml PROPERTIES RESOURCE "${CMAKE_CURRENT_SOURCE_DIR}/src/ggml-metal.metal")
 #endif()
-install(TARGETS ggml LIBRARY PUBLIC_HEADER)
-install(TARGETS ggml-base LIBRARY)
+# install(TARGETS ggml LIBRARY PUBLIC_HEADER)
+# install(TARGETS ggml-base LIBRARY)
+
+install(
+  TARGETS ggml-base ggml
+  EXPORT GGML_TARGETS
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
 if (GGML_STANDALONE)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/ggml.pc.in
@@ -325,10 +340,22 @@ set(GGML_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR} CACHE PATH "Location of
 set(GGML_LIB_INSTALL_DIR     ${CMAKE_INSTALL_LIBDIR}     CACHE PATH "Location of library files")
 set(GGML_BIN_INSTALL_DIR     ${CMAKE_INSTALL_BINDIR}     CACHE PATH "Location of binary  files")
 
+
+install(
+  EXPORT
+    GGML_TARGETS
+  FILE
+    ggml-targets.cmake
+  NAMESPACE
+    ggml::
+  DESTINATION
+    cmake
+)
+
 configure_package_config_file(
         ${CMAKE_CURRENT_SOURCE_DIR}/cmake/ggml-config.cmake.in
         ${CMAKE_CURRENT_BINARY_DIR}/ggml-config.cmake
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ggml
+    INSTALL_DESTINATION cmake
     PATH_VARS GGML_INCLUDE_INSTALL_DIR
               GGML_LIB_INSTALL_DIR
               GGML_BIN_INSTALL_DIR)
@@ -340,4 +367,4 @@ write_basic_package_version_file(
 
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/ggml-config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/ggml-version.cmake
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/ggml)
+        DESTINATION cmake)

@@ -87,9 +87,13 @@ set(LLAMA_COMMON_EXTRA_LIBS build_info)
 if (LLAMA_CURL)
     find_package(CURL REQUIRED)
     target_compile_definitions(${TARGET} PUBLIC LLAMA_USE_CURL)
-    include_directories(${CURL_INCLUDE_DIRS})
-    find_library(CURL_LIBRARY curl REQUIRED)
-    set(LLAMA_COMMON_EXTRA_LIBS ${LLAMA_COMMON_EXTRA_LIBS} ${CURL_LIBRARY})
+    # get_target_property(CURL_INCLUDE_DIRS CURL::libcurl INTERFACE_INCLUDE_DIRECTORIES)
+    # include_directories(${CURL_INCLUDE_DIRS})
+    # find_library(CURL_LIBRARY curl REQUIRED)
+    # set(LLAMA_COMMON_EXTRA_LIBS ${LLAMA_COMMON_EXTRA_LIBS} CURL::libcurl)
+
+    target_link_libraries (${TARGET} PUBLIC CURL::libcurl)
+
 endif ()
 
 if (LLAMA_LLGUIDANCE)
